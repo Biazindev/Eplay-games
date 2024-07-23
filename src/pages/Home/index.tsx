@@ -1,104 +1,59 @@
-import Banner from "../../components/Banner";
-import ProductsList from "../../components/ProductsList";
-import Game from "../../models/games";
-import resident from '../../assets/images/resident.png'
-import diablo from '../../assets/images/diablo.png'
-import zelda from '../../assets/images/zelda.png'
-import starWars from '../../assets/images/star_wars.png'
+import Banner from "../../components/Banner"
+import ProductsList from "../../components/ProductsList"
+import { useEffect, useState } from "react"
 
+export interface GalleryItem {
+    type: 'image' | 'video'
+    url: string
+}
 
-const promocoes: Game[] = [
-    {
-        id: 1,
-        category: 'acão',
-        description: 'Resident Evil 4, e conhecido no Japão como Biohazard 4, é um jogo eletrônico de survival de horror...',
-        title: 'Resident Evil 4',
-        system: 'Windows',
-        image: resident,
-        infos: ['10%', 'R$ 250,00'],
-
-    },
-    {
-        id: 2,
-        category: 'acão',
-        description: 'Resident Evil 4, e conhecido no Japão como Biohazard 4, é um jogo eletrônico de survival de horror...',
-        title: 'Resident Evil 4',
-        system: 'PS5',
-        image: resident,
-        infos: ['5%', 'R$ 290,00'],
-
-    },
-    {
-        id: 3,
-        category: 'acão',
-        description: 'Resident Evil 4, e conhecido no Japão como Biohazard 4, é um jogo eletrônico de survival de horror...',
-        title: 'Resident Evil 4',
-        system: 'Windows',
-        image: resident,
-        infos: ['10%', 'R$ 250,00'],
-
-    },
-    {
-        id: 4,
-        category: 'acão',
-        description: 'Resident Evil 4, e conhecido no Japão como Biohazard 4, é um jogo eletrônico de survival de horror...',
-        title: 'Resident Evil 4',
-        system: 'Windows',
-        image: resident,
-        infos: ['10%', 'R$ 250,00'],
-
+export type Game = {
+    id: number
+    name: string
+    description: string
+    release_date?: string
+    prices: {
+        discount?: number
+        old?: number
+        current?: number
     }
-]
-
-const emBreve: Game[] = [
-    {
-        id: 5,
-        category: 'RPG',
-        description: 'Diablo IV é um RPG de ação em desenvolvimento pela Blizzard Entertaiment',
-        title: 'DIABLO IV',
-        system: 'Windows',
-        image: diablo,
-        infos: ['17/05'],
-
-    },
-    {
-        id: 6,
-        category: 'RPG',
-        description: 'Diablo IV é um RPG de ação em desenvolvimento pela Blizzard Entertaiment',
-        title: 'Zelda',
-        system: 'Windows',
-        image: zelda,
-        infos: ['17/05'],
-
-    },
-    {
-        id: 7,
-        category: 'RPG',
-        description: 'Diablo IV é um RPG de ação em desenvolvimento pela Blizzard Entertaiment',
-        title: 'Stars Wars',
-        system: 'Windows',
-        image: starWars,
-        infos: ['17/05'],
-
-    },
-    {
-        id: 8,
-        category: 'RPG',
-        description: 'Resident Evil 4, e conhecido no Japão como Biohazard 4, é um jogo eletrônico de survival de horror...',
-        title: 'Resident Evil 4',
-        system: 'Nintendo Switch',
-        image: resident,
-        infos: ['17/05'],
-
+    details:  {
+        category: string
+        system: string
+        developer: string
+        publisher: string
+        languages: string[]
     }
-]
+    media: {
+        thumbnail: string
+        cover: string
+        gallery: GalleryItem[]
+    }
+}
 
-const Home = () => (
-    <>
-    <Banner />
-    <ProductsList title="Promoções" background={'grey'} games={promocoes} />
-    <ProductsList title="Em Breve" background={'black'} games={emBreve} />
-    </>
-)
+const Home = () => {
+    const [promocoes, setPromocoes] = useState<Game[]>([])
+    const [emBreve, setEmBreve] = useState<Game[]>([])
+
+    useEffect(() => {
+        fetch('https://fake-api-tau.vercel.app/api/eplay/promocoes')
+            .then(res => res.json())
+            .then(data => setPromocoes(data))
+            .catch(err => console.error("Failed to fetch promotions", err))
+
+        fetch('https://fake-api-tau.vercel.app/api/eplay/em-breve')
+            .then(res => res.json())
+            .then(data => setEmBreve(data))
+            .catch(err => console.error("Failed to fetch upcoming games", err))
+    }, [])
+
+    return (
+        <>
+            <Banner />
+            <ProductsList title="Promoções" background={'grey'} games={promocoes} />
+            <ProductsList title="Em Breve" background={'black'} games={emBreve} />
+        </>
+    )
+}
 
 export default Home
